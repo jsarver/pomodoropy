@@ -1,0 +1,9 @@
+# Default ignored files
+/shelf/
+/.idea/workspace.xml
+# Datasource local storage ignored files
+/../../../../../../:\Users\jsarver\PycharmProjects\pomodoropy\.idea/dataSources/
+/.idea/dataSources.local.xml
+# Editor-based HTTP Client requests
+/httpRequests/
+/.idea/
