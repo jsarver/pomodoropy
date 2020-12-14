@@ -2,24 +2,36 @@ import sys
 import time
 
 from PySide2.QtUiTools import QUiLoader
-from PySide2.QtWidgets import QApplication, QPushButton, QLabel, QTextEdit, QPlainTextEdit
+from PySide2.QtWidgets import QApplication, QPushButton, QLabel, QTextEdit, QPlainTextEdit, QMessageBox
 from PySide2.QtCore import QFile, QObject, QTimer
 from PySide2.QtCore import Qt
 from win10toast import ToastNotifier
 
-DURATION = 1500
+
 toaster = ToastNotifier()
+
+
+class Config(object):
+    def __init__(self, notify_type, duration=1500):
+        self.notifyType = notify_type
+        self.duration = duration
+
+
+cfg = Config("modal")
+
 
 class Form(QObject):
 
-    def __init__(self, ui_file, parent=None, client=None):
+    def __init__(self, ui_file, parent=None, client=None, config=cfg):
         super(Form, self).__init__(parent)
         ui_file = QFile(ui_file)
         loader = QUiLoader()
         self.window = loader.load(ui_file)
         ui_file.close()
         self.start = False
-        self.count = DURATION
+        self.duration = cfg.duration
+        self.count = cfg.duration
+        self.current_task = ""
 
         # creating start button
         start_button = self.window.findChild(QPushButton, 'startButton')
@@ -40,7 +52,6 @@ class Form(QObject):
 
         self.timerText = self.window.findChild(QPushButton, 'toggleButton')
 
-
         # creating a timer object
         self.timer = QTimer(self)
 
@@ -49,7 +60,7 @@ class Form(QObject):
         self.timer.start(1000)
 
         # setting label text
-        self.timerText.setText(f"{int(DURATION / 60)}")
+        self.timerText.setText(f"{int(self.duration / 60)}")
         # self.window.destroyed.connect(self.window.close)
 
         self.window.show()
@@ -70,11 +81,8 @@ class Form(QObject):
         if self.count == 0:
             self.reset_action()
         print(f'starting {self.count}')
-        toaster.show_toast("starting timer",
-                           "Starting Timer",
-                           icon_path=None,
-                           duration=0,
-                           threaded=True)
+        self.notify("starting Timer", self.current_task, "toaster")
+
 
     def pause_action(self):
         # making flag false
@@ -83,7 +91,7 @@ class Form(QObject):
     def reset_action(self):
         # making flag false
         self.start = False
-        self.count = DURATION
+        self.count = self.duration
         self.timerText.setText(f"{self.count / 60:.0f}")
 
     def updateTime(self):
@@ -97,16 +105,29 @@ class Form(QObject):
                 self.count = 0
                 text = str(self.count)
                 self.timerText.setText(text)
-                toaster.show_toast("timer Done",
-                                   "timer for task has been completed",
-                                   icon_path=None,
-                                   duration=0,
-                                   threaded=True)
+                self.notify("Timer Done",self.current_task)
+
+    def notify(self,title, message,notify_type=None):
+        notify_type = notify_type if notify_type else self.config.notifyType
+        if notify_type == "Modal":
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Information)
+
+            msg.setText(message)
+
+            msg.exec_()
+        else:
+            toaster.show_toast(title,
+                               message,
+                               icon_path=None,
+                               duration=0,
+                               threaded=True)
 
     def add_task(self):
-        task = self.window.findChild(QPlainTextEdit,"addTaskTextEdit")
-        current_task = self.window.findChild(QLabel,"currentTaskLabel")
-        current_task.setText(task.toPlainText())
+        task = self.window.findChild(QPlainTextEdit, "addTaskTextEdit")
+        taskLabel = self.window.findChild(QLabel, "currentTaskLabel")
+        self.current_task = task.toPlainText()
+        taskLabel.setText(task.toPlainText())
 
 
 if __name__ == '__main__':
