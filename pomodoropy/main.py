@@ -3,8 +3,8 @@ import time
 
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QApplication, QPushButton, QLabel, QTextEdit, QPlainTextEdit, QMessageBox
-from PySide2.QtCore import QFile, QObject, QTimer
-from PySide2.QtCore import Qt
+from PySide2.QtCore import QFile, QObject, QTimer, Qt
+from PySide2 import QtWidgets
 from win10toast import ToastNotifier
 
 
@@ -19,7 +19,6 @@ class Config(object):
 
 cfg = Config("modal")
 
-
 class Form(QObject):
 
     def __init__(self, ui_file, parent=None, client=None, config=cfg):
@@ -32,6 +31,8 @@ class Form(QObject):
         self.duration = cfg.duration
         self.count = cfg.duration
         self.current_task = ""
+        self.window.setWindowModality(Qt.ApplicationModal)
+        self.window.setFocusPolicy(Qt.StrongFocus)
 
         # creating start button
         start_button = self.window.findChild(QPushButton, 'startButton')
@@ -81,7 +82,7 @@ class Form(QObject):
         if self.count == 0:
             self.reset_action()
         print(f'starting {self.count}')
-        self.notify("starting Timer", self.current_task, "toaster")
+        self.notify("starting Timer", self.current_task, notify_type="toast",toast_duration=2)
 
 
     def pause_action(self):
@@ -105,24 +106,25 @@ class Form(QObject):
                 self.count = 0
                 text = str(self.count)
                 self.timerText.setText(text)
-                self.notify("Timer Done",self.current_task)
+                self.notify("Timer Done",self.current_task,"toast")
 
-    def notify(self,title, message,notify_type=None):
-        notify_type = notify_type if notify_type else self.config.notifyType
-        if notify_type == "Modal":
+    def notify(self,title, message,notify_type="modal",toast_duration=5):
+        notify_type = notify_type if notify_type else cfg.notifyType
+        if notify_type == "modal":
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Information)
-
             msg.setText(message)
-
+            msg.setWindowTitle(title)
             msg.exec_()
+
         else:
+            self.window.raise_()
+            self.window.activateWindow()
             toaster.show_toast(title,
                                message,
                                icon_path=None,
-                               duration=0,
+                               duration=toast_duration,
                                threaded=True)
-
     def add_task(self):
         task = self.window.findChild(QPlainTextEdit, "addTaskTextEdit")
         taskLabel = self.window.findChild(QLabel, "currentTaskLabel")
