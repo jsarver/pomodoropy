@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>PomodoroPy</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>pomo.png</normaloff>pomo.png</iconset>
+  </property>
   <property name="toolButtonStyle">
    <enum>Qt::ToolButtonIconOnly</enum>
   </property>
