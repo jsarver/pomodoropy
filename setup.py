@@ -1,15 +1,14 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='pomodoropy',
     version='v.0.0.3',
-    packages=['pomodoropy'],
+    packages=find_packages(),
     url='',
     license='MIT',
     author='Josh Sarver',
     author_email='josh.sarver@gmail.com',
     description='Pomodoro timer for task',
-    # data_files=["pomodoropy/images"],
     include_package_data=True,
     entry_points={
         'console_scripts': [

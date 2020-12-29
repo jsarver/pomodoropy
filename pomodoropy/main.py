@@ -7,7 +7,7 @@ from PySide2.QtWidgets import QApplication, QPushButton, QLabel, QTextEdit, QPla
 from PySide2.QtCore import QFile, QObject, QTimer, Qt, QCoreApplication
 from PySide2 import QtWidgets
 from win10toast import ToastNotifier
-import resources
+from pomodoropy import resources
 
 package_directory = os.path.dirname(os.path.abspath(__file__))
 
