@@ -8,7 +8,13 @@ setup(
     license='MIT',
     author='Josh Sarver',
     author_email='josh.sarver@gmail.com',
-    description='Pomodoro timer for task'
+    description='Pomodoro timer for task',
+    # data_files=["pomodoropy/images"],
+    include_package_data=True,
+    entry_points={
+        'console_scripts': [
+            'pomodoro = pomodoropy.main:entry_point',
+        ],
+    }
 )
-#todo add dependencies
-#todo add console script interface
+# todo add dependencies

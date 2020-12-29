@@ -1,12 +1,15 @@
+import os
 import sys
 import time
 
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QApplication, QPushButton, QLabel, QTextEdit, QPlainTextEdit, QMessageBox
-from PySide2.QtCore import QFile, QObject, QTimer, Qt
+from PySide2.QtCore import QFile, QObject, QTimer, Qt, QCoreApplication
 from PySide2 import QtWidgets
 from win10toast import ToastNotifier
+import resources
 
+package_directory = os.path.dirname(os.path.abspath(__file__))
 
 toaster = ToastNotifier()
 
@@ -18,6 +21,7 @@ class Config(object):
 
 
 cfg = Config("modal")
+
 
 class Form(QObject):
 
@@ -82,8 +86,7 @@ class Form(QObject):
         if self.count == 0:
             self.reset_action()
         print(f'starting {self.count}')
-        self.notify("starting Timer", self.current_task, notify_type="toast",toast_duration=2)
-
+        self.notify("starting Timer", self.current_task, notify_type="toast", toast_duration=2)
 
     def pause_action(self):
         # making flag false
@@ -106,9 +109,9 @@ class Form(QObject):
                 self.count = 0
                 text = str(self.count)
                 self.timerText.setText(text)
-                self.notify("Timer Done",self.current_task,"toast")
+                self.notify("Timer Done", self.current_task, "toast")
 
-    def notify(self,title, message,notify_type="modal",toast_duration=5):
+    def notify(self, title, message, notify_type="modal", toast_duration=5):
         notify_type = notify_type if notify_type else cfg.notifyType
         if notify_type == "modal":
             msg = QMessageBox()
@@ -125,6 +128,7 @@ class Form(QObject):
                                icon_path=None,
                                duration=toast_duration,
                                threaded=True)
+
     def add_task(self):
         task = self.window.findChild(QPlainTextEdit, "addTaskTextEdit")
         taskLabel = self.window.findChild(QLabel, "currentTaskLabel")
@@ -132,10 +136,14 @@ class Form(QObject):
         taskLabel.setText(task.toPlainText())
 
 
-if __name__ == '__main__':
+def entry_point():
+    QCoreApplication.setAttribute(Qt.AA_ShareOpenGLContexts)
     app = QApplication(sys.argv)
     app.setStyle("cleanlooks")
-    form = Form('timer.ui')
+    timer_ui = os.path.join(package_directory, 'timer.ui')
+    form = Form(timer_ui)
 
     print('start exit')
     sys.exit(app.exec_())
+
+entry_point()

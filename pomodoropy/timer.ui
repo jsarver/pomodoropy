@@ -14,8 +14,8 @@
    <string>PomodoroPy</string>
   </property>
   <property name="windowIcon">
-   <iconset>
-    <normaloff>pomo.png</normaloff>pomo.png</iconset>
+   <iconset resource="resources.qrc">
+    <normaloff>:/pomodoropy/images/pomo.png</normaloff>:/pomodoropy/images/pomo.png</iconset>
   </property>
   <property name="toolButtonStyle">
    <enum>Qt::ToolButtonIconOnly</enum>
@@ -175,6 +175,8 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
