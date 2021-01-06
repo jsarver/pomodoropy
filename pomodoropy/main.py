@@ -1,16 +1,13 @@
 import os
 import sys
-import time
 
 from PySide2.QtUiTools import QUiLoader
-from PySide2.QtWidgets import QApplication, QPushButton, QLabel, QTextEdit, QPlainTextEdit, QMessageBox
+from PySide2.QtWidgets import QApplication, QPushButton, QLabel, QPlainTextEdit, QMessageBox
 from PySide2.QtCore import QFile, QObject, QTimer, Qt, QCoreApplication
-from PySide2 import QtWidgets
 from win10toast import ToastNotifier
 from pomodoropy import resources
 
 package_directory = os.path.dirname(os.path.abspath(__file__))
-
 toaster = ToastNotifier()
 
 
@@ -19,9 +16,7 @@ class Config(object):
         self.notifyType = notify_type
         self.duration = duration
 
-
 cfg = Config("modal")
-
 
 class Form(QObject):
 
@@ -145,5 +140,6 @@ def entry_point():
 
     print('start exit')
     sys.exit(app.exec_())
+
 
 entry_point()
