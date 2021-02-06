@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="pomodoropy">
     <file>images/pomo.png</file>
+    <file>images/reset.jpg</file>
   </qresource>
 </RCC>

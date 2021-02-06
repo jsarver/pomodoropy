@@ -2,7 +2,7 @@ import os
 import sys
 
 from PySide2.QtUiTools import QUiLoader
-from PySide2.QtWidgets import QApplication, QPushButton, QLabel, QPlainTextEdit, QMessageBox
+from PySide2.QtWidgets import QApplication, QPushButton, QLabel, QPlainTextEdit, QMessageBox, QTableView
 from PySide2.QtCore import QFile, QObject, QTimer, Qt, QCoreApplication
 from win10toast import ToastNotifier
 from pomodoropy import resources
@@ -32,38 +32,28 @@ class Form(QObject):
         self.current_task = ""
         self.window.setWindowModality(Qt.ApplicationModal)
         self.window.setFocusPolicy(Qt.StrongFocus)
+        self.window.setWindowFlag(Qt.WindowStaysOnTopHint)
 
-        # creating start button
-        start_button = self.window.findChild(QPushButton, 'startButton')
-        start_button.clicked.connect(self.start_action)
+        self.toggle_button = self.window.findChild(QPushButton, 'toggleButton')
+        self.toggle_button.clicked.connect(self.toggle_action)
 
-        toggle_button = self.window.findChild(QPushButton, 'toggleButton')
-        toggle_button.clicked.connect(self.toggle_action)
 
-        # creating pause button
-        pause_button = self.window.findChild(QPushButton, 'pauseButton')
-        pause_button.clicked.connect(self.pause_action)
+        self.add_button = self.window.findChild(QPushButton, 'addButton')
+        self.add_button.clicked.connect(self.add_task)
 
-        reset_button = self.window.findChild(QPushButton, 'resetButton')
-        reset_button.clicked.connect(self.reset_action)
+        self.reset_button = self.window.findChild(QPushButton, 'resetButton')
+        self.reset_button.clicked.connect(self.reset_action)
 
-        add_button = self.window.findChild(QPushButton, 'addButton')
-        add_button.clicked.connect(self.add_task)
-
-        self.timerText = self.window.findChild(QPushButton, 'toggleButton')
-
-        # creating a timer object
+        # creating a timer object and connect to update method
         self.timer = QTimer(self)
-
-        # adding action to timer
         self.timer.timeout.connect(self.updateTime)
         self.timer.start(1000)
 
         # setting label text
-        self.timerText.setText(f"{int(self.duration / 60)}")
+        self.toggle_button.setText(f"{int(self.duration / 60)}")
         # self.window.destroyed.connect(self.window.close)
 
-        self.window.show()
+
 
     def toggle_action(self):
         print(f"staring action {self.start}")
@@ -91,19 +81,19 @@ class Form(QObject):
         # making flag false
         self.start = False
         self.count = self.duration
-        self.timerText.setText(f"{self.count / 60:.0f}")
+        self.toggle_button.setText(f"{self.count / 60:.0f}")
 
     def updateTime(self):
         if self.start:
             if self.count > 0:
                 self.count -= 1
                 text = str(f"{int(self.count / 60)}.{self.count % 60}")
-                self.timerText.setText(text)
+                self.toggle_button.setText(text)
             else:
                 self.start = False
                 self.count = 0
                 text = str(self.count)
-                self.timerText.setText(text)
+                self.toggle_button.setText(text)
                 self.notify("Timer Done", self.current_task, "toast")
 
     def notify(self, title, message, notify_type="modal", toast_duration=5):
@@ -125,10 +115,12 @@ class Form(QObject):
                                threaded=True)
 
     def add_task(self):
+        print("setting task")
         task = self.window.findChild(QPlainTextEdit, "addTaskTextEdit")
         taskLabel = self.window.findChild(QLabel, "currentTaskLabel")
         self.current_task = task.toPlainText()
         taskLabel.setText(task.toPlainText())
+        self.tasks_view = self.window.findChild(QTableView, 'tasksView')
 
 
 def entry_point():
@@ -137,7 +129,7 @@ def entry_point():
     app.setStyle("cleanlooks")
     timer_ui = os.path.join(package_directory, 'timer.ui')
     form = Form(timer_ui)
-
+    form.window.show()
     print('start exit')
     sys.exit(app.exec_())
 

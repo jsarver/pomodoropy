@@ -1,0 +1,11 @@
+bookdelegate process
+
+--main.py
+initializes the Bookwindow class
+window class calls the show function that opens the dialog
+
+--bookwindow.py
+bookwindow subclasses ui_window
+
+--ui_bookwindow
+sets the layout and sizing for the overall ui
